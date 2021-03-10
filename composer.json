@@ -1,0 +1,14 @@
+{
+    "name": "dartmoon/prestashop-tabmanager",
+    "description": "Library to easy the creation of backoffice menu tabs for PrestaShop",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alessandro Pasqualini",
+            "email": "alessandro@dartmoon.io",
+            "homepage": "https://dartmoon.io"
+        }
+    ],
+    "require": {}
+}
