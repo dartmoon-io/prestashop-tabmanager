@@ -5,10 +5,19 @@
     "license": "MIT",
     "authors": [
         {
+            "name": "Dartmoon",
+            "email": "hello@dartmoon.io",
+            "homepage": "https://dartmoon.io"
+        },
+        {
             "name": "Alessandro Pasqualini",
             "email": "alessandro@dartmoon.io",
-            "homepage": "https://dartmoon.io"
         }
     ],
-    "require": {}
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Dartmoon\\TabManager\\": "src/"
+        }
+    }
 }
