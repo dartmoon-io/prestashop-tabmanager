@@ -42,7 +42,7 @@ class TabManager
         $idParent = $parent;
         if (is_string($parent)) {
             $parentTab = $this->tabRepository->findOneByClassName($parent);
-            $idParent = $parentTab->id;
+            $idParent = $parentTab->getId();
         }
         $tab->id_parent = (int) $idParent;
 
@@ -58,9 +58,9 @@ class TabManager
      */
     public function uninstallTab($className)
     {
-        $idTab = $this->tabRepository->findOneByClassName($className);
-        if ($idTab) {
-            $tab = new Tab($idTab);
+        $tab = $this->tabRepository->findOneByClassName($className);
+        if ($tab) {
+            $tab = new Tab($tab->getId());
             $tab->delete();
             return true;
         }
