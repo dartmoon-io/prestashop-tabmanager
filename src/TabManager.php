@@ -71,14 +71,14 @@ class TabManager
     /**
      * Install multiple tabs
      */
-    public function install(array $tabs)
+    public function install(array $tabs, $module = '')
     {
         foreach ($tabs as $tab) {
             $this->installTab(
                 $tab['name'],
                 $tab['class_name'],
                 $tab['parent'],
-                $tab['module'] ?? '',
+                $module,
                 $tab['icon'] ?? ''
             );
         }
