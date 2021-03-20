@@ -73,7 +73,7 @@ class TabManager
         $tab->class_name = $tabDetails->get('class_name');
         $tab->route_name = $tabDetails->get('route_name');
         $tab->icon = $tabDetails->get('icon');
-        $tab->active = $tabDetails->getBoolean('active');
+        $tab->active = $tabDetails->getBoolean('visible');
         $tab->name = MultiLangText::generate($tabDetails->get('name'));
         $tab->save();
     }
@@ -102,6 +102,6 @@ class TabManager
         }
 
         $parentTab = $this->tabRepository->findOneByClassName($parentClassName);
-        return $parentTab ? $parentTab->id : 0;
+        return $parentTab ? $parentTab->getId() : 0;
     }
 }
