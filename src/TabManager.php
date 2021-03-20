@@ -3,7 +3,7 @@
 namespace Dartmoon\TabManager;
 
 use Dartmoon\Utils\Facades\MultiLangText;
-use PrestaShop\PrestaShop\Adapter\Entity\Module;
+use Module;
 use PrestaShop\PrestaShop\Adapter\Entity\Tab;
 use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
 use PrestaShopBundle\Entity\Tab as EntityTab;
