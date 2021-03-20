@@ -3,8 +3,11 @@
 namespace Dartmoon\TabManager;
 
 use Dartmoon\Utils\Facades\MultiLangText;
+use PrestaShop\PrestaShop\Adapter\Entity\Module;
 use PrestaShop\PrestaShop\Adapter\Entity\Tab;
 use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
+use PrestaShopBundle\Entity\Tab as EntityTab;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 class TabManager
 {
@@ -25,62 +28,12 @@ class TabManager
     }
 
     /**
-     * Install a tab menu into PrestaShop menu
-     */
-    public function installTab($name, $className, $parent, $module = '', $icon = '') 
-    {
-        $name = is_array($name) ?: MultiLangText::generate($name);
-
-        // Create the new Tab
-        $tab = new Tab();
-        $tab->class_name = $className;
-        $tab->name = $name;
-        $tab->icon = $icon;
-        $tab->module = $module;
-
-        // Find the parent
-        $idParent = $parent;
-        if (is_string($parent)) {
-            $parentTab = $this->tabRepository->findOneByClassName($parent);
-            $idParent = $parentTab->getId();
-        }
-        $tab->id_parent = (int) $idParent;
-
-        // Save the tab
-        $tab->save();
-
-        // Return the tab (its ID is needed to nesting other tabs)
-        return $tab;
-    }
-
-    /**
-     * Uninstall a tab menu from PrestaShop menu
-     */
-    public function uninstallTab($className)
-    {
-        $tab = $this->tabRepository->findOneByClassName($className);
-        if ($tab) {
-            $tab = new Tab($tab->getId());
-            $tab->delete();
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * Install multiple tabs
      */
-    public function install(array $tabs, $module = '')
+    public function install(array $tabs, Module $module = null)
     {
-        foreach ($tabs as $tab) {
-            $this->installTab(
-                $tab['name'],
-                $tab['class_name'],
-                $tab['parent'],
-                $module,
-                $tab['icon'] ?? ''
-            );
+        foreach ($tabs as $tabDetails) {
+            $this->installTab(new ParameterBag($tabDetails), $module);
         }
     }
 
@@ -89,8 +42,66 @@ class TabManager
      */
     public function uninstall(array $tabs)
     {
-        foreach ($tabs as $tab) {
-            $this->uninstallTab($tab['class_name']);
+        foreach ($tabs as $tabDetails) {
+            $tab = $this->tabRepository->findOneByClassName($tabDetails['class_name']);
+            $this->uninstallTab($tab);
         }
+    }
+
+    /**
+     * Uninstall multiple tabs
+     */
+    public function uninstallForModule($module)
+    {
+        // We use the Tab repository to have only
+        // installed tabs related to the module
+        $tabs = $this->tabRepository->findByModule($module->name);
+        foreach ($tabs as $tab) {
+            $this->uninstallTab($tab);
+        }
+    }
+
+    /**
+     * Install a tab menu into PrestaShop menu
+     */
+    private function installTab(ParameterBag $tabDetails, Module $module) 
+    {
+        // Create the new Tab
+        $tab = new Tab();
+        $tab->id_parent = $this->getIdParent($tabDetails);
+        $tab->module = $module ? $module->name : null;
+        $tab->class_name = $tabDetails->get('class_name');
+        $tab->route_name = $tabDetails->get('route_name');
+        $tab->icon = $tabDetails->get('icon');
+        $tab->active = $tabDetails->getBoolean('active');
+        $tab->name = MultiLangText::generate($tabDetails->get('name'));
+        $tab->save();
+    }
+
+    /**
+     * Uninstall a tab menu from PrestaShop menu
+     */
+    private function uninstallTab(EntityTab $entityTab)
+    {
+        if (!$entityTab) {
+            return;
+        }
+
+        $tab = new Tab($entityTab->getId());
+        $tab->delete();
+    }
+
+    /**
+     * Get the parent id
+     */
+    private function getIdParent(ParameterBag $tabDetails)
+    {
+        $parentClassName = $tabDetails->get('parent_class_name');
+        if (empty($parentClassName)) {
+            return 0;
+        }
+
+        $parentTab = $this->tabRepository->findOneByClassName($parentClassName);
+        return $parentTab ? $parentTab->id : 0;
     }
 }
