@@ -32,9 +32,11 @@ class TabManager
      */
     public function install(array $tabs, Module $module = null)
     {
+        $status = true;
         foreach ($tabs as $tabDetails) {
-            $this->installTab(new ParameterBag($tabDetails), $module);
+            $status = $status && $this->installTab(new ParameterBag($tabDetails), $module);
         }
+        return $status;
     }
 
     /**
@@ -42,10 +44,12 @@ class TabManager
      */
     public function uninstall(array $tabs)
     {
+        $status = true;
         foreach ($tabs as $tabDetails) {
             $tab = $this->tabRepository->findOneByClassName($tabDetails['class_name']);
-            $this->uninstallTab($tab);
+            $status = $status && $this->uninstallTab($tab);
         }
+        return $status;
     }
 
     /**
@@ -56,9 +60,11 @@ class TabManager
         // We use the Tab repository to have only
         // installed tabs related to the module
         $tabs = $this->tabRepository->findByModule($module->name);
+        $status = true;
         foreach ($tabs as $tab) {
-            $this->uninstallTab($tab);
+            $status = $status && $this->uninstallTab($tab);
         }
+        return $status;
     }
 
     /**
@@ -75,7 +81,7 @@ class TabManager
         $tab->icon = $tabDetails->get('icon');
         $tab->active = $tabDetails->getBoolean('visible');
         $tab->name = MultiLangText::generate($tabDetails->get('name'));
-        $tab->save();
+        return $tab->save();
     }
 
     /**
@@ -88,7 +94,7 @@ class TabManager
         }
 
         $tab = new Tab($entityTab->getId());
-        $tab->delete();
+        return $tab->delete();
     }
 
     /**
