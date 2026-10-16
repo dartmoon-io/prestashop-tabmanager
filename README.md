@@ -1,3 +1,8 @@
+> **Abandoned repository.** This repository is no longer maintained.
+> For current PrestaShop module development, use the
+> [prestashop-module repository](https://github.com/dartmoon-io/prestashop-module).
+> The documentation below describes the abandoned implementation.
+
 # Prestashop TabManager
 A simple package that allows you to add your controllers to the PrestaShop Backoffice menu. Simply define an array with all the menu items and let the package install them. 
 
